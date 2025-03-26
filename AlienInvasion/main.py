@@ -5,7 +5,7 @@
 import os
 import pygame
 import sys
-from lib import Player, mobs_generate
+from lib import World
 from pygame import K_LEFT, K_RIGHT, K_SPACE
  
 FPS = 60
@@ -16,21 +16,22 @@ TEXTURE_PATH = os.path.join(
     "textures"
 )
 MOBS_GRID = [5, 5, 5, 5]
+CONTROL_KEYS = {"left": K_LEFT, "right": K_RIGHT, "shot":K_SPACE}
 
 screen = pygame.display.set_mode((W, H))
 clock = pygame.time.Clock()
-all_sprites = pygame.sprite.Group()
-
-player = Player(
-    speed=5,
-    cooldown=FPS//2,
-    bullet_speed=5,
-    texture_path=TEXTURE_PATH,
-    control_keys={"left": K_LEFT, "right": K_RIGHT, "shot":K_SPACE},
-    display_params={"width": W, "height": H}
+all_sprites = World(
+    screen_width = W,
+    screen_height = H,
+    player_speed = 5,
+    player_cooldown = 30,
+    bullet_speed = 5,
+    mobs_grid = MOBS_GRID,
+    texture_path = TEXTURE_PATH,
+    control_keys = CONTROL_KEYS,
+    mob_cost = 100
 )
-all_sprites.add(player)
-mobs_generate(MOBS_GRID, all_sprites, TEXTURE_PATH, {"width": W, "height": H})
+
  
 while True:
     for event in pygame.event.get():
