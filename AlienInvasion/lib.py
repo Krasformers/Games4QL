@@ -5,6 +5,7 @@
 import sys
 import os
 from pygame.sprite import Sprite, Group
+from pygame.rect import Rect
 from pygame.image import load
 from pygame.key import get_pressed
 from pygame import KEYDOWN
@@ -79,7 +80,7 @@ class Bullet(Sprite):
             self,
             texture_path:str,
             speed:int,
-            start_point:tuple[int],
+            start_point:tuple[int, int],
             *groups
         ):
         super().__init__(*groups)
@@ -92,7 +93,7 @@ class Bullet(Sprite):
     def move(self):
         self.rect.y -= self.speed
         if self.rect.y < 0:
-            self.groups()[0].remove(self)
+            self.groups()[0].remove(self) # type: ignore
     
     def update(self, *args, **kwargs):
         self.move()
@@ -196,10 +197,13 @@ class World(Group):
         self.check_hit()
         self.game_over()
 
-    def draw(self, surface, bgsurf = None, special_flags = 0) -> None:
+    def draw(self, surface, bgsurf = None, special_flags = 0) -> list[Rect]:
         super().draw(surface, bgsurf, special_flags)
         self.bullets.draw(surface, bgsurf, special_flags)
         self.mobs.draw(surface, bgsurf, special_flags)
+        self.lostsprites = []
+        dirty = self.lostsprites
+        return dirty
 
     def mobs_generate(
             self,
@@ -228,7 +232,7 @@ class World(Group):
                         x_speed=2,
                         y_speed=8,
                         steps_to_next_turn=64,
-                        direction=v_level%2,
+                        direction=bool(v_level%2),
                         x_position=(x_pos * x_step) + first_cood,
                         y_position=y_step*(v_level+1)
                     )
